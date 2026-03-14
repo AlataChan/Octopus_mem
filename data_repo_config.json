@@ -1,0 +1,20 @@
+{
+  "framework": {
+    "name": "Octopus_mem",
+    "url": "https://github.com/AlataChan/Octopus_mem",
+    "type": "public",
+    "description": "AI Agent记忆系统框架（开源）"
+  },
+  "data": {
+    "name": "opc_memory_data", 
+    "url": "https://github.com/AlataChan/opc_memory_data",
+    "type": "private",
+    "description": "OPC团队私有记忆数据存储"
+  },
+  "sync": {
+    "enabled": true,
+    "interval": "daily",
+    "encryption": "optional",
+    "exclude_patterns": ["*.md", "*.jsonl"]
+  }
+}

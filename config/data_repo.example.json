@@ -1,0 +1,17 @@
+{
+  "data_repository": {
+    "type": "git",
+    "url": "https://github.com/AlataChan/opc_memory_data",
+    "branch": "main",
+    "private": true
+  },
+  "local_paths": {
+    "memory": "./memory",
+    "indexes": "./indexes"
+  },
+  "sync": {
+    "auto_pull": true,
+    "auto_push": false,
+    "encryption_key": "optional"
+  }
+}

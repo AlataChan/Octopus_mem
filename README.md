@@ -1,10 +1,24 @@
 # Octopus_mem - AI Agent记忆系统
 
-## 项目概述
+## 🎯 项目概述
 
-Octopus_mem是一个基于skill + memory索引架构的AI agent记忆系统，遵循"jsonl, md, 最多sqlite"的极简原则，实现高效、可扩展的记忆管理。
+Octopus_mem是一个基于**skill + memory索引架构**的AI agent记忆系统，遵循"jsonl, md, 最多sqlite"的极简原则，采用**框架开源 + 数据私有化**的双仓库架构。
 
-## 核心特性
+## 🏗️ 双仓库架构
+
+### 1. 框架仓库 (公开)
+- **仓库**: [Octopus_mem](https://github.com/AlataChan/Octopus_mem)
+- **内容**: 记忆系统框架代码、工具、文档
+- **许可证**: MIT
+- **目标**: 开源共享，社区贡献
+
+### 2. 数据仓库 (私有)  
+- **仓库**: [opc_memory_data](https://github.com/AlataChan/opc_memory_data) (私有)
+- **内容**: 实际记忆文档、工作日志、索引数据
+- **权限**: 严格访问控制
+- **目标**: 保护团队内部工作记忆
+
+## ✨ 核心特性
 
 ### 1. 极简存储架构
 - **Markdown**：长期记忆、知识库
@@ -69,15 +83,46 @@ Octopus_mem/
 3. **知识库构建**: 构建可演化的知识网络
 4. **对话历史管理**: 管理多轮对话的上下文记忆
 
-## 快速开始
+## 🔄 数据同步
+
+### 设置数据仓库
+```bash
+# 1. 克隆框架仓库
+git clone https://github.com/AlataChan/Octopus_mem.git
+cd Octopus_mem
+
+# 2. 设置私有数据仓库（需要访问权限）
+python tools/data_sync.py
+
+# 3. 检查同步状态
+./tools/sync_data.sh status
+```
+
+### 日常同步命令
+```bash
+# 拉取最新数据
+./tools/sync_data.sh pull
+
+# 推送本地更改
+./tools/sync_data.sh push
+
+# 查看状态
+./tools/sync_data.sh status
+```
+
+## 🚀 快速开始
 
 ```bash
-# 克隆仓库
+# 克隆框架仓库
 git clone https://github.com/AlataChan/Octopus_mem.git
 
 # 安装依赖
 cd Octopus_mem
 pip install -r requirements.txt
+
+# 配置数据仓库路径
+cp config/data_repo.example.json config/data_repo.json
+# 编辑config/data_repo.json设置私有仓库URL
 
 # 运行示例
 python examples/basic_usage.py
