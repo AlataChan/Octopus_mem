@@ -1,67 +1,123 @@
-# Octopus_mem
+# Octopus_mem - AI Agent记忆系统
 
-Octopus_mem 是一个面向 AI Agent 的**可解释、可迁移**记忆系统，核心是 **Skill-first 的记忆索引架构**：
-先由 skill（能力/任务类型）限定检索范围，再从 memory（文本记忆库）中取回最相关片段，最后把结构化上下文交给 agent。
+## 项目概述
 
-## 设计原则（默认极简）
+Octopus_mem是一个基于skill + memory索引架构的AI agent记忆系统，遵循"jsonl, md, 最多sqlite"的极简原则，实现高效、可扩展的记忆管理。
 
-- **文件即数据库**：以 `Markdown / JSON / JSONL` 为主（可读、可 diff、可备份）
-- **最多 SQLite**：只有在确实需要关系查询/事务时才引入
-- **索引可再生**：`indexes/` 可随时重建，`memory/` 才是源数据
-- **可追溯**：索引条目必须能回指到具体文件与位置（路径/标题/时间）
+## 核心特性
 
-## 目录约定（建议）
+### 1. 极简存储架构
+- **Markdown**：长期记忆、知识库
+- **JSON/JSONL**：配置、日志、会话记录
+- **SQLite**：结构化数据（仅当需要时）
+
+### 2. Skill + Memory索引
+- 每个skill拥有独立的记忆索引
+- 分层检索：skill索引 → 每日记忆 → 长期记忆
+- 动态记忆链接和演化
+
+### 3. 基于Anthropic研究
+- 借鉴Anthropic Agent Harness架构
+- 采用A-MEM论文的Zettelkasten方法
+- 实现Mem0风格的可扩展记忆中心架构
+
+## 系统架构
 
 ```
-.
-├── skills/                    # skill 定义与检索提示（human-written）
-│   └── <skill_name>/SKILL.md
-├── memory/                    # 记忆源数据（human/agent-written）
-│   ├── MEMORY.md              # 长期记忆（汇总/原则/不随日期滚动）
-│   └── daily/                 # 每日记忆（工作日志/对话/决策）
-│       └── YYYY-MM-DD.md
-├── indexes/                   # 由工具生成的索引（machine-written, 可重建）
-│   ├── global.jsonl           # 全局索引（可选）
-│   └── skills/                # 每个 skill 的局部索引（推荐）
-│       └── <skill_name>.jsonl
-└── tools/                     # 索引构建/检索工具（计划）
+Octopus_mem/
+├── memory/                    # 记忆存储
+│   ├── long_term/            # 长期记忆 (Markdown)
+│   │   └── MEMORY.md
+│   ├── daily/                # 每日记忆 (Markdown)
+│   │   └── YYYY-MM-DD.md
+│   └── skill_indexes/        # Skill记忆索引 (JSON)
+│       ├── github.index.json
+│       ├── dev.index.json
+│       └── ...
+├── storage/                  # 数据存储
+│   ├── config/              # 配置 (JSON)
+│   ├── logs/                # 日志 (JSONL)
+│   └── data/                # 结构化数据 (SQLite)
+├── skills/                  # 记忆相关skill
+│   ├── memory_indexer/      # 记忆索引skill
+│   ├── memory_retriever/    # 记忆检索skill
+│   └── memory_evolver/      # 记忆演化skill
+└── core/                    # 核心模块
+    ├── memory_manager.py    # 记忆管理器
+    ├── index_engine.py      # 索引引擎
+    └── retrieval_engine.py  # 检索引擎
 ```
 
-## Skill-first 检索流程（概念）
+## 技术栈
 
-1. **路由到 skill**：根据问题选择 1~N 个可能相关的 `skill`
-2. **读取 skill 索引**：优先查询 `indexes/skills/<skill>.jsonl`
-3. **回表取原文**：根据索引条目的 `ref` 回到 `memory/` 中抓取片段
-4. **必要时兜底**：再查 `indexes/global.jsonl`（或 SQLite）补全
+- **语言**: Python 3.10+
+- **存储**: Markdown, JSON/JSONL, SQLite
+- **索引**: 基于关键词和语义的混合索引
+- **检索**: 分层检索 + 语义相似度
 
-## 索引条目（JSONL）建议字段
+## 设计原则
 
-> 目标：可追溯、可合并、可增量更新；不强依赖 embedding。
+1. **简单性优先**: 避免过度设计，用最简单的工具解决问题
+2. **渐进式升级**: 先用文件系统，需要时再加SQLite
+3. **零成本运维**: 无需额外数据库服务
+4. **易维护**: 文件系统最直观，备份迁移简单
 
-```json
-{
-  "id": "mem_2026-03-14_0913",
-  "ts": "2026-03-14T09:13:00+08:00",
-  "skills": ["memory-indexing", "architecture"],
-  "tags": ["原则", "检索", "索引"],
-  "summary": "强调极简：jsonl+md，最多sqlite；并要求 skill-first 的记忆索引模式。",
-  "ref": {
-    "path": "memory/daily/2026-03-14.md",
-    "anchor": "09:13 - 鑫哥对数据库方案的批评"
-  }
-}
+## 使用场景
+
+1. **AI Agent记忆管理**: 为OpenClaw等AI agent系统提供记忆能力
+2. **Skill记忆索引**: 实现skill-specific的记忆检索
+3. **知识库构建**: 构建可演化的知识网络
+4. **对话历史管理**: 管理多轮对话的上下文记忆
+
+## 快速开始
+
+```bash
+# 克隆仓库
+git clone https://github.com/AlataChan/Octopus_mem.git
+
+# 安装依赖
+cd Octopus_mem
+pip install -r requirements.txt
+
+# 运行示例
+python examples/basic_usage.py
 ```
 
-## 灵感来源（参考）
+## 开发计划
 
-- Anthropic 的 agent harness / repo 级记忆实践
-- A-MEM（Zettelkasten 风格的动态链接与索引）
-- Mem0（可扩展的记忆中心与检索接口）
+### 第一阶段（v0.1.0）
+- [ ] 基础记忆存储架构
+- [ ] Skill记忆索引原型
+- [ ] 基础检索功能
 
-## Roadmap（建议）
+### 第二阶段（v0.2.0）
+- [ ] 记忆演化机制
+- [ ] 跨skill记忆链接
+- [ ] 性能优化
 
-- v0：目录结构 + 文档（你现在看到的）
-- v0.1：`tools/` 索引构建器（扫描 `skills/` 与 `memory/` 生成 JSONL）
-- v0.2：skill 路由 + 片段抽取 + 上下文拼装（本地可用）
-- v0.3：可选 SQLite 后端（仅在确有需求时）
+### 第三阶段（v0.3.0）
+- [ ] 记忆重要性评分
+- [ ] 记忆衰减机制
+- [ ] 可视化工具
 
+## 贡献指南
+
+欢迎提交Issue和Pull Request。请遵循以下规范：
+1. 代码风格遵循PEP 8
+2. 添加适当的单元测试
+3. 更新相关文档
+
+## 许可证
+
+MIT License
+
+## 致谢
+
+- Anthropic的Agent Harness研究
+- A-MEM论文的Zettelkasten方法
+- Mem0的可扩展记忆架构
+
+---
+
+**使命**: 让AI agent拥有像章鱼一样灵活、分布式的记忆系统
+**口号**: 记忆在，智能在
