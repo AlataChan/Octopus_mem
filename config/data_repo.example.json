@@ -6,8 +6,9 @@
     "private": true
   },
   "local_paths": {
-    "memory": "./memory",
-    "indexes": "./indexes"
+    "data_root": "./.data_temp",
+    "memory": "./.data_temp/memory",
+    "indexes": "./.data_temp/indexes"
   },
   "sync": {
     "auto_pull": true,

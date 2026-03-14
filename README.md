@@ -91,8 +91,8 @@ Octopus_mem/
 git clone https://github.com/AlataChan/Octopus_mem.git
 cd Octopus_mem
 
-# 2. 设置私有数据仓库（需要访问权限）
-python tools/data_sync.py
+# 2. 初始化私有数据仓库（需要访问权限）
+git submodule update --init --recursive
 
 # 3. 检查同步状态
 ./tools/sync_data.sh status
@@ -122,7 +122,7 @@ pip install -r requirements.txt
 
 # 配置数据仓库路径
 cp config/data_repo.example.json config/data_repo.json
-# 编辑config/data_repo.json设置私有仓库URL
+# 编辑 config/data_repo.json（默认使用 ./.data_temp 作为数据目录）
 
 # 运行示例
 python examples/basic_usage.py

@@ -43,20 +43,45 @@ class DataSyncManager:
     def setup_data_repository(self):
         """设置数据仓库"""
         print("🔧 设置数据仓库...")
-        
-        # 创建临时数据目录
+
+        data_url = self.config["data"]["url"]
+
+        # 1) 已存在（submodule 或普通 clone）则直接复用，避免误删私有数据
+        if self.data_dir.exists() and (self.data_dir / ".git").exists():
+            try:
+                existing_url = (
+                    self._run_git_command(["remote", "get-url", "origin"], cwd=self.data_dir)
+                    .stdout.strip()
+                )
+                if existing_url != data_url:
+                    self._run_git_command(["remote", "set-url", "origin", data_url], cwd=self.data_dir)
+            except subprocess.CalledProcessError:
+                self._run_git_command(["remote", "add", "origin", data_url], cwd=self.data_dir)
+
+            print(f"✅ 数据仓库已就绪: {data_url}")
+            return
+
+        # 2) 如果当前仓库包含 submodule 配置，则优先初始化 submodule
+        try:
+            self._run_git_command(
+                ["submodule", "update", "--init", "--recursive", str(self.data_dir)],
+                cwd=self.framework_dir,
+            )
+            if (self.data_dir / ".git").exists():
+                print(f"✅ 数据仓库已通过 submodule 初始化: {data_url}")
+                return
+        except subprocess.CalledProcessError:
+            pass
+
+        # 3) 兜底：初始化一个本地 git 仓库并绑定 remote（用于首次创建/迁移）
         if self.data_dir.exists():
             shutil.rmtree(self.data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
-        
-        # 初始化Git仓库
+
         self._run_git_command(["init"], cwd=self.data_dir)
         self._run_git_command(["branch", "-m", "main"], cwd=self.data_dir)
-        
-        # 添加remote
-        data_url = self.config["data"]["url"]
         self._run_git_command(["remote", "add", "origin", data_url], cwd=self.data_dir)
-        
+
         print(f"✅ 数据仓库已初始化: {data_url}")
     
     def migrate_existing_data(self):
