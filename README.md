@@ -83,6 +83,41 @@ Octopus_mem/
 3. **知识库构建**: 构建可演化的知识网络
 4. **对话历史管理**: 管理多轮对话的上下文记忆
 
+
+
+## 🧠 Agent记忆索引技能
+
+OPC团队每个agent都配备了专用的记忆索引技能：
+
+| Agent | 神兽 | Skill名称 | 描述 | Emoji |
+|-------|------|-----------|------|-------|
+| molt | 德塔龙骑 | `memory-molt` | 总指挥、团队协调、任务分发 | 🐉 |
+| dev | 玄武铸甲 | `memory-dev` | 代码开发、技术架构、部署运维 | 🐢 |
+| content | 朱雀羽笔 | `memory-content` | 公众号文章、文案策划、内容创作 | 🔥 |
+| ops | 白虎破阵 | `memory-ops` | 用户增长、社交媒体、市场推广 | 🐯 |
+| law | 麒麟判官 | `memory-law` | 合同审查、合规咨询、风险评估 | 🦄 |
+| finance | 金蟾司库 | `memory-finance` | 期权交易、财务管理、成本分析 | 🐸 |
+
+### 使用示例
+
+```bash
+# 使用molt的记忆检索
+cd projects/Octopus_mem/skills/memory_molt
+node scripts/retrieve.mjs "团队协调任务"
+
+# 使用dev的技术记忆检索  
+cd projects/Octopus_mem/skills/memory_dev
+node scripts/retrieve.mjs "技术架构设计"
+
+# 更新ops的记忆索引
+cd projects/Octopus_mem/skills/memory_ops
+node scripts/update_index.mjs
+```
+
+### 集成到对话系统
+
+每个agent在对话开始时自动检索相关记忆，遵循**对话即检索 + skill中心 + 时间衰减**原则。
+
 ## 🔄 数据同步
 
 ### 设置数据仓库

@@ -1,0 +1,8 @@
+{
+  "ownerId": "opc_team",
+  "slug": "memory-dev",
+  "version": "1.0.0",
+  "createdAt": "2026-03-14T10:39:57.881294",
+  "agent": "dev",
+  "skillType": "memory_retrieval"
+}

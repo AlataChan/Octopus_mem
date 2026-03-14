@@ -1,0 +1,8 @@
+{
+  "ownerId": "opc_team",
+  "slug": "memory-finance",
+  "version": "1.0.0",
+  "createdAt": "2026-03-14T10:39:57.884044",
+  "agent": "finance",
+  "skillType": "memory_retrieval"
+}

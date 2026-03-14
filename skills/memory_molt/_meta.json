@@ -1,0 +1,8 @@
+{
+  "ownerId": "opc_team",
+  "slug": "memory-molt",
+  "version": "1.0.0",
+  "createdAt": "2026-03-14T10:39:57.880602",
+  "agent": "molt",
+  "skillType": "memory_retrieval"
+}

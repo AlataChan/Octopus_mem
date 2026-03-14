@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+// 德塔龙骑索引更新脚本
+
+const { execSync } = require('child_process');
+const path = require('path');
+
+console.log(`🔄 更新🐉 德塔龙骑记忆索引...`);
+
+try {
+  // 运行数据同步工具
+  const syncScript = path.join(__dirname, '../../tools/data_sync.py');
+  const command = `python3 "${syncScript}" --agent molt`;
+  
+  const output = execSync(command, { encoding: 'utf-8' });
+  console.log(output);
+  
+  console.log(`✅ 德塔龙骑索引更新完成`);
+  
+} catch (error) {
+  console.error('索引更新失败:', error.message);
+  process.exit(1);
+}

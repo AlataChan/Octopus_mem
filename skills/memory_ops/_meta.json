@@ -1,0 +1,8 @@
+{
+  "ownerId": "opc_team",
+  "slug": "memory-ops",
+  "version": "1.0.0",
+  "createdAt": "2026-03-14T10:39:57.882688",
+  "agent": "ops",
+  "skillType": "memory_retrieval"
+}

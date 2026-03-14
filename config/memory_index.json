@@ -1,0 +1,109 @@
+{
+  "version": "1.0.0",
+  "description": "OPC团队极简记忆索引配置",
+  "created_at": "2026-03-14T10:34:00+08:00",
+  "creator": "德塔龙骑",
+  
+  "global_settings": {
+    "retrieval_enabled": true,
+    "max_results": 5,
+    "time_decay_enabled": true,
+    "decay_days": 7,
+    "min_relevance_score": 0.3,
+    "cache_ttl_seconds": 300
+  },
+  
+  "agents": {
+    "molt": {
+      "skill_name": "orchestrator",
+      "description": "总指挥、团队协调",
+      "related_skills": ["dev", "ops", "content", "law", "finance"],
+      "memory_priority": "high",
+      "retrieval_strategy": "real_time_all"
+    },
+    "dev": {
+      "skill_name": "development",
+      "description": "代码开发、技术架构",
+      "related_skills": ["molt", "ops"],
+      "memory_priority": "high",
+      "retrieval_strategy": "real_time_skill"
+    },
+    "content": {
+      "skill_name": "content_creation",
+      "description": "内容创作、文案策划",
+      "related_skills": ["molt", "ops"],
+      "memory_priority": "medium",
+      "retrieval_strategy": "real_time_skill"
+    },
+    "ops": {
+      "skill_name": "operations",
+      "description": "用户增长、市场运营",
+      "related_skills": ["molt", "dev", "content"],
+      "memory_priority": "high",
+      "retrieval_strategy": "real_time_skill"
+    },
+    "law": {
+      "skill_name": "legal",
+      "description": "合同审查、合规咨询",
+      "related_skills": ["molt"],
+      "memory_priority": "medium",
+      "retrieval_strategy": "on_demand"
+    },
+    "finance": {
+      "skill_name": "finance",
+      "description": "财务管理、交易分析",
+      "related_skills": ["molt"],
+      "memory_priority": "high",
+      "retrieval_strategy": "real_time_skill"
+    }
+  },
+  
+  "retrieval_strategies": {
+    "real_time_all": {
+      "description": "实时检索所有相关记忆",
+      "trigger": "conversation_start",
+      "scope": "current_skill + related_skills",
+      "time_window": "7d",
+      "cache_enabled": true
+    },
+    "real_time_skill": {
+      "description": "实时检索当前skill记忆",
+      "trigger": "conversation_start",
+      "scope": "current_skill_only",
+      "time_window": "7d",
+      "cache_enabled": true
+    },
+    "on_demand": {
+      "description": "按需检索",
+      "trigger": "explicit_request",
+      "scope": "current_skill_only",
+      "time_window": "30d",
+      "cache_enabled": false
+    }
+  },
+  
+  "time_decay_config": {
+    "algorithm": "linear_exponential",
+    "linear_days": 7,
+    "linear_weight_at_day7": 0.5,
+    "exponential_base": 0.8,
+    "min_weight": 0.1,
+    "max_weight": 1.0
+  },
+  
+  "index_structure": {
+    "memory_dir": "memory",
+    "index_dir": "indexes/skills",
+    "config_dir": "config",
+    "log_dir": "logs",
+    "cache_dir": ".cache/memory"
+  },
+  
+  "maintenance": {
+    "daily_reindex": true,
+    "reindex_time": "02:00",
+    "cleanup_days": 30,
+    "stats_collection": true,
+    "performance_monitoring": true
+  }
+}
