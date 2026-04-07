@@ -5,5 +5,6 @@
 # chromadb>=0.4.0
 
 # 工具依赖
+jsonschema>=4.0.0
 python-dotenv>=1.0.0
 tqdm>=4.65.0

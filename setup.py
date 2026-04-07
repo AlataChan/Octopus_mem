@@ -12,6 +12,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 with open("requirements.txt", "r", encoding="utf-8") as fh:
     requirements = [line.strip() for line in fh if line.strip() and not line.startswith("#")]
 
+install_requires = list(dict.fromkeys([*requirements, "jsonschema>=4.0.0"]))
+
 setup(
     name="octopus-mem",
     version="0.1.0",
@@ -34,7 +36,7 @@ setup(
         "Programming Language :: Python :: 3.12",
     ],
     python_requires=">=3.10",
-    install_requires=requirements,
+    install_requires=install_requires,
     extras_require={
         "dev": [
             "black>=23.0.0",

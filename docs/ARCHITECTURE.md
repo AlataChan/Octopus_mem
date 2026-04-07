@@ -53,4 +53,8 @@ The index file is the source of truth in this phase. Rebuilding from markdown wo
 
 The lock window covers the full read-modify-write. Callers may not read outside the mutator. `fcntl.flock` is advisory on both macOS and Linux; we only ever touch our own lockfiles, so BSD vs POSIX differences are invisible. Stale `.lock` files left behind by crashed processes are harmless disk noise because flock state lives in the kernel, not the filename.
 
+## Schema Validation
+
+Schema validation is on by default. `locked_update_json(..., validate_in=..., validate_out=...)` runs both validators inside the existing `LOCK_EX` window, so a validation failure leaves the original file untouched. Read-only consumers use `read_json_validated(..., validator=...)` under `LOCK_SH`. Set `OCTOPUS_MEM_VALIDATE=0` to disable both paths without changing the lock behavior.
+
 Dev install: `pip install -e ".[dev]"` — runtime deps are minimal; `pytest`/`ruff`/`black` live in the dev extras.

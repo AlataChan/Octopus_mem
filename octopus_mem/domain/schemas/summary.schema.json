@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "title": "Summary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "date",
+    "entries"
+  ],
+  "properties": {
+    "version": {
+      "const": "1.0.0"
+    },
+    "date": {
+      "type": "string"
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

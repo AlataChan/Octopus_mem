@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "title": "SkillIndex",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "skill_name",
+    "last_updated",
+    "memory_entries",
+    "statistics"
+  ],
+  "properties": {
+    "version": {
+      "const": "1.0.0"
+    },
+    "skill_name": {
+      "type": "string"
+    },
+    "last_updated": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "memory_entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "timestamp",
+          "content_preview",
+          "search_text",
+          "tags",
+          "source"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "content_preview": {
+            "type": "string"
+          },
+          "search_text": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "statistics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total_memories",
+        "last_memory_id"
+      ],
+      "properties": {
+        "total_memories": {
+          "type": "integer"
+        },
+        "last_memory_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

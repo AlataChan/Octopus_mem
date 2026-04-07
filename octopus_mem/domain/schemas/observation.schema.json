@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "title": "Observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "id",
+    "content",
+    "timestamp",
+    "type",
+    "skill",
+    "metadata"
+  ],
+  "properties": {
+    "version": {
+      "const": "1.0.0"
+    },
+    "id": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "daily",
+        "long_term"
+      ]
+    },
+    "skill": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "metadata": {
+      "type": "object"
+    }
+  }
+}

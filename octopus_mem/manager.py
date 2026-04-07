@@ -14,6 +14,15 @@ from typing import Dict, List, Optional, Any
 import hashlib
 
 
+def _schema_validator_or_none(schema_name: str):
+    if os.getenv("OCTOPUS_MEM_VALIDATE") == "0":
+        return None
+
+    from octopus_mem.domain.validate import schema_validator
+
+    return schema_validator(schema_name)
+
+
 class MemoryManager:
     """记忆管理器"""
 
@@ -127,6 +136,7 @@ class MemoryManager:
 
         def _empty():
             return {
+                "version": "1.0.0",
                 "skill_name": skill_name,
                 "last_updated": None,
                 "memory_entries": [],
@@ -153,7 +163,14 @@ class MemoryManager:
             index_data["statistics"]["last_memory_id"] = memory_obj["id"]
             return index_data
 
-        locked_update_json(Path(index_path), _append, default_factory=_empty)
+        validator = _schema_validator_or_none("skill_index")
+        locked_update_json(
+            Path(index_path),
+            _append,
+            default_factory=_empty,
+            validate_in=validator,
+            validate_out=validator,
+        )
     
     def _log_memory_storage(self, memory_obj: Dict):
         """记录记忆存储日志"""
@@ -204,14 +221,18 @@ class MemoryManager:
     
     def _search_skill_index(self, skill_name: str, query: str, limit: int) -> List[Dict]:
         """搜索skill索引"""
+        from octopus_mem.storage import read_json_validated
+
         index_path = os.path.join(self.base_path, 
                                  f"memory/skill_indexes/{skill_name}.index.json")
         
         if not os.path.exists(index_path):
             return []
         
-        with open(index_path, "r", encoding="utf-8") as f:
-            index_data = json.load(f)
+        index_data = read_json_validated(
+            Path(index_path),
+            validator=_schema_validator_or_none("skill_index"),
+        )
         
         # 简单文本匹配（可以升级为语义搜索）
         query_words = set(query.lower().split())
