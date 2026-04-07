@@ -19,17 +19,14 @@ metadata: {
 ### 检索相关记忆
 ```bash
 # 检索与查询相关的记忆
-node {baseDir}/scripts/retrieve.mjs "查询内容"
+octopus-mem retrieve "查询内容" --skill law
 
 # 示例
-node {baseDir}/scripts/retrieve.mjs "数据库方案讨论"
+octopus-mem retrieve "数据库方案讨论" --skill law
 ```
 
 ### 更新记忆索引
-```bash
-# 更新当前skill的记忆索引
-node {baseDir}/scripts/update_index.mjs
-```
+The on-disk index file is updated automatically by `store_memory`. There is no separate reindex command; see `docs/ARCHITECTURE.md` for the rationale.
 
 ## 检索策略
 
@@ -52,5 +49,9 @@ node {baseDir}/scripts/update_index.mjs
 ## 数据来源
 
 - 私有数据仓库: `opc_memory_data`
-- 索引位置: `indexes/skills/legal.index.json`
+- 索引位置: `memory/skill_indexes/law.index.json`
 - 记忆文档: `memory/daily/` + `memory/long_term/`
+
+## Migration
+
+The `.mjs` wrappers have been removed. Use `octopus-mem retrieve "..." --skill law` directly. The existing `memory/skill_indexes/law.index.json` file is still consumed unchanged by the retrieve command, so no rebuild is needed. See `docs/ARCHITECTURE.md` for the naming contract and why there is no reindex command.
