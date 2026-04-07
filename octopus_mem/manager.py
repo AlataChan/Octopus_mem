@@ -9,6 +9,7 @@ import os
 import json
 import re
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Dict, List, Optional, Any
 import hashlib
 
@@ -116,47 +117,43 @@ class MemoryManager:
     
     def _update_skill_index(self, skill_name: str, memory_obj: Dict):
         """更新skill索引"""
+        from octopus_mem.storage import locked_update_json
+
         skill_dir = os.path.realpath(os.path.join(self.base_path, "memory/skill_indexes"))
         index_path = os.path.realpath(os.path.join(skill_dir, f"{skill_name}.index.json"))
 
         if os.path.commonpath([index_path, skill_dir]) != skill_dir:
             raise ValueError(f"Invalid skill_name path: {skill_name}")
-        
-        # 读取现有索引
-        if os.path.exists(index_path):
-            with open(index_path, "r", encoding="utf-8") as f:
-                index_data = json.load(f)
-        else:
-            index_data = {
+
+        def _empty():
+            return {
                 "skill_name": skill_name,
-                "last_updated": datetime.now().isoformat(),
+                "last_updated": None,
                 "memory_entries": [],
                 "statistics": {
                     "total_memories": 0,
                     "last_memory_id": None
                 }
             }
-        
-        # 添加新记忆条目
-        index_entry = {
-            "id": memory_obj["id"],
-            "timestamp": memory_obj["timestamp"],
-            "content_preview": memory_obj["content"][:100] + "..." 
-                               if len(memory_obj["content"]) > 100 
-                               else memory_obj["content"],
-            "search_text": memory_obj["content"].lower(),
-            "tags": memory_obj["metadata"].get("tags", []),
-            "source": f"memory/{memory_obj['type']}/{memory_obj['id']}"
-        }
-        
-        index_data["memory_entries"].append(index_entry)
-        index_data["last_updated"] = datetime.now().isoformat()
-        index_data["statistics"]["total_memories"] = len(index_data["memory_entries"])
-        index_data["statistics"]["last_memory_id"] = memory_obj["id"]
-        
-        # 保存索引
-        with open(index_path, "w", encoding="utf-8") as f:
-            json.dump(index_data, f, ensure_ascii=False, indent=2)
+
+        def _append(index_data):
+            index_entry = {
+                "id": memory_obj["id"],
+                "timestamp": memory_obj["timestamp"],
+                "content_preview": memory_obj["content"][:100] + "..."
+                                   if len(memory_obj["content"]) > 100
+                                   else memory_obj["content"],
+                "search_text": memory_obj["content"].lower(),
+                "tags": memory_obj["metadata"].get("tags", []),
+                "source": f"memory/{memory_obj['type']}/{memory_obj['id']}"
+            }
+            index_data["memory_entries"].append(index_entry)
+            index_data["last_updated"] = datetime.now().isoformat()
+            index_data["statistics"]["total_memories"] = len(index_data["memory_entries"])
+            index_data["statistics"]["last_memory_id"] = memory_obj["id"]
+            return index_data
+
+        locked_update_json(Path(index_path), _append, default_factory=_empty)
     
     def _log_memory_storage(self, memory_obj: Dict):
         """记录记忆存储日志"""
