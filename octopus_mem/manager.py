@@ -35,13 +35,7 @@ class MemoryManager:
             "memory/long_term",
             "memory/daily",
             "memory/skill_indexes",
-            "storage/config",
             "storage/logs",
-            "storage/data",
-            "skills/memory_indexer",
-            "skills/memory_retriever",
-            "skills/memory_evolver",
-            "core"
         ]
         
         for directory in directories:

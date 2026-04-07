@@ -38,9 +38,9 @@ setup(
     extras_require={
         "dev": [
             "black>=23.0.0",
-            "flake8>=6.0.0",
             "pytest>=7.0.0",
             "pytest-cov>=4.0.0",
+            "ruff>=0.6.0",
         ],
         "semantic": [
             "sentence-transformers>=2.2.0",

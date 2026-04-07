@@ -3,7 +3,7 @@ import subprocess
 import sys
 import pytest
 
-from memory_manager import MemoryManager  # noqa: E402  (Phase 0: still in core/, conftest adds the path)
+from octopus_mem import MemoryManager
 
 
 # --- F0.1 regression ---
@@ -27,9 +27,8 @@ def test_long_term_scan_finds_recent_entries(tmp_path):
 # --- F0.3 regression: stable IDs across two python processes ---
 def test_long_term_id_stable_across_processes(tmp_path):
     script = (
-        "import sys, json, pathlib;"
-        "sys.path.insert(0, 'core');"
-        "from memory_manager import MemoryManager;"
+        "import json;"
+        "from octopus_mem import MemoryManager;"
         f"mm = MemoryManager(base_path={str(tmp_path)!r});"
         "mm.store_memory('stable content for hashing', memory_type='long_term');"
         "print(json.dumps([r['id'] for r in mm.retrieve_memory('stable')]))"
@@ -100,3 +99,20 @@ def test_data_repo_config_has_no_landmine_field():
     import pathlib
     cfg = json.loads((pathlib.Path(__file__).parent.parent / "data_repo_config.json").read_text())
     assert "exclude_patterns" not in cfg.get("sync", {})
+
+
+def test_long_term_dedup_collapses_identical_content(tmp_path):
+    """Phase 0 introduced retrieval-time dedup of long-term entries
+    with identical content (same content-hash ID). Lock the behavior
+    so Phase 2-5 refactors don't accidentally re-introduce duplicates.
+    """
+    from octopus_mem import MemoryManager
+    mm = MemoryManager(base_path=str(tmp_path))
+    for _ in range(3):
+        mm.store_memory('identical long term content', memory_type='long_term')
+    results = mm.retrieve_memory('identical')
+    matching = [r for r in results
+                if 'identical long term content' in r['content_preview']]
+    assert len(matching) == 1, (
+        f'expected dedup to 1 entry, got {len(matching)}: {results}'
+    )
