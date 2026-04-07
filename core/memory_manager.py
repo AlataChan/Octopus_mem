@@ -7,14 +7,17 @@
 
 import os
 import json
-import sqlite3
-from datetime import datetime
+import re
+from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 import hashlib
 
 
 class MemoryManager:
     """记忆管理器"""
+
+    VALID_MEMORY_TYPES = {"daily", "long_term"}
+    SKILL_NAME_PATTERN = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9_\-]{0,62}[A-Za-z0-9])?$")
     
     def __init__(self, base_path: str = "."):
         """
@@ -59,6 +62,10 @@ class MemoryManager:
         Returns:
             记忆ID
         """
+        self._validate_memory_type(memory_type)
+        if skill_name is not None:
+            self._validate_skill_name(skill_name)
+
         memory_id = self._generate_memory_id(content)
         timestamp = datetime.now().isoformat()
         
@@ -102,11 +109,24 @@ class MemoryManager:
         
         with open(file_path, "a", encoding="utf-8") as f:
             f.write(entry)
+
+    def _validate_memory_type(self, memory_type: str):
+        """校验记忆类型"""
+        if memory_type not in self.VALID_MEMORY_TYPES:
+            raise ValueError(f"Invalid memory_type: {memory_type}")
+
+    def _validate_skill_name(self, skill_name: str):
+        """校验skill名称"""
+        if not self.SKILL_NAME_PATTERN.fullmatch(skill_name):
+            raise ValueError(f"Invalid skill_name: {skill_name}")
     
     def _update_skill_index(self, skill_name: str, memory_obj: Dict):
         """更新skill索引"""
-        index_path = os.path.join(self.base_path, 
-                                 f"memory/skill_indexes/{skill_name}.index.json")
+        skill_dir = os.path.realpath(os.path.join(self.base_path, "memory/skill_indexes"))
+        index_path = os.path.realpath(os.path.join(skill_dir, f"{skill_name}.index.json"))
+
+        if os.path.commonpath([index_path, skill_dir]) != skill_dir:
+            raise ValueError(f"Invalid skill_name path: {skill_name}")
         
         # 读取现有索引
         if os.path.exists(index_path):
@@ -130,7 +150,7 @@ class MemoryManager:
             "content_preview": memory_obj["content"][:100] + "..." 
                                if len(memory_obj["content"]) > 100 
                                else memory_obj["content"],
-            "keywords": self._extract_keywords(memory_obj["content"]),
+            "search_text": memory_obj["content"].lower(),
             "tags": memory_obj["metadata"].get("tags", []),
             "source": f"memory/{memory_obj['type']}/{memory_obj['id']}"
         }
@@ -143,22 +163,6 @@ class MemoryManager:
         # 保存索引
         with open(index_path, "w", encoding="utf-8") as f:
             json.dump(index_data, f, ensure_ascii=False, indent=2)
-    
-    def _extract_keywords(self, content: str, max_keywords: int = 5) -> List[str]:
-        """提取关键词（简化版）"""
-        # 这里可以集成更复杂的关键词提取算法
-        words = content.lower().split()
-        common_words = {"的", "了", "在", "是", "我", "有", "和", "就", "不", "人", "都", "一", "一个", "上", "也", "很", "到", "说", "要", "去", "你", "会", "着", "没有", "看", "好", "自己", "这"}
-        
-        keywords = []
-        for word in words:
-            if (len(word) > 1 and word not in common_words 
-                and word.isalpha() and word not in keywords):
-                keywords.append(word)
-                if len(keywords) >= max_keywords:
-                    break
-        
-        return keywords
     
     def _log_memory_storage(self, memory_obj: Dict):
         """记录记忆存储日志"""
@@ -218,19 +222,14 @@ class MemoryManager:
         with open(index_path, "r", encoding="utf-8") as f:
             index_data = json.load(f)
         
-        # 简单关键词匹配（可以升级为语义搜索）
+        # 简单文本匹配（可以升级为语义搜索）
         query_words = set(query.lower().split())
         matched_entries = []
         
         for entry in index_data["memory_entries"]:
-            score = 0
-            entry_text = (entry["content_preview"] + " " + 
-                         " ".join(entry["keywords"]) + " " + 
-                         " ".join(entry["tags"]))
-            entry_words = set(entry_text.lower().split())
-            
-            # 计算匹配分数
-            score = len(query_words.intersection(entry_words))
+            search_text = entry.get("search_text", entry.get("content_preview", "").lower())
+            tags_text = " ".join(entry.get("tags", [])).lower()
+            score = sum(1 for word in query_words if word in search_text or word in tags_text)
             
             if score > 0:
                 matched_entries.append({
@@ -288,10 +287,15 @@ class MemoryManager:
         query_words = set(query.lower().split())
         
         results = []
-        for para in paragraphs[:10]:  # 只检查前10段
-            if len(para) > 50 and any(word in para.lower() for word in query_words):
+        seen_ids = set()
+        for para in paragraphs:
+            if para.strip() and any(word in para.lower() for word in query_words):
+                memory_id = self._generate_memory_id(para)
+                if memory_id in seen_ids:
+                    continue
+                seen_ids.add(memory_id)
                 results.append({
-                    "id": f"long_term_{hash(para) % 10000}",
+                    "id": memory_id,
                     "timestamp": "长期记忆",
                     "content_preview": para[:200] + "..." 
                                       if len(para) > 200 else para,
