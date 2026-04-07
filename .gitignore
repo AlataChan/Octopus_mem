@@ -4,4 +4,10 @@ indexes/**/*.db
 **/__pycache__/
 *.pyc
 .DS_Store
-
+.coverage
+.ccb/
+.cursor/
+memory/daily/
+memory/skill_indexes/
+octopus_mem.egg-info/
+storage/logs/
