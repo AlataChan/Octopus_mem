@@ -1,0 +1,13 @@
+{
+  "name": "open_question_pinned",
+  "budget_tokens": 100,
+  "candidates": [
+    {"id": "q1", "content": "open question", "score": 0.05, "recency_days": 30, "kind": "open_question", "token_count": 20},
+    {"id": "f1", "content": "high score fact", "score": 0.95, "recency_days": 0, "kind": "fact", "token_count": 80},
+    {"id": "f2", "content": "second fact", "score": 0.80, "recency_days": 0, "kind": "fact", "token_count": 20}
+  ],
+  "expected_selected_ids": ["q1", "f1"],
+  "expected_rejected_reasons": {
+    "f2": "budget"
+  }
+}

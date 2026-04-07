@@ -1,0 +1,14 @@
+{
+  "name": "happy_path",
+  "budget_tokens": 300,
+  "pin_kinds": [],
+  "candidates": [
+    {"id": "d1", "content": "decision one", "score": 0.95, "recency_days": 0, "kind": "decision", "token_count": 50},
+    {"id": "f1", "content": "fact one", "score": 0.90, "recency_days": 1, "kind": "fact", "token_count": 40},
+    {"id": "s1", "content": "summary one", "score": 0.80, "recency_days": 2, "kind": "summary", "token_count": 30},
+    {"id": "f2", "content": "fact two", "score": 0.70, "recency_days": 3, "kind": "fact", "token_count": 20},
+    {"id": "d2", "content": "decision two", "score": 0.60, "recency_days": 4, "kind": "decision", "token_count": 10}
+  ],
+  "expected_selected_ids": ["d1", "f1", "s1", "f2", "d2"],
+  "expected_rejected_reasons": {}
+}

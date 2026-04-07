@@ -1,0 +1,18 @@
+{
+  "name": "budget_overflow",
+  "budget_tokens": 100,
+  "pin_kinds": [],
+  "candidates": [
+    {"id": "a1", "content": "alpha", "score": 0.99, "recency_days": 0, "kind": "decision", "token_count": 60},
+    {"id": "b1", "content": "beta", "score": 0.95, "recency_days": 0, "kind": "fact", "token_count": 30},
+    {"id": "c1", "content": "gamma", "score": 0.90, "recency_days": 0, "kind": "summary", "token_count": 20},
+    {"id": "d1", "content": "delta", "score": 0.85, "recency_days": 0, "kind": "fact", "token_count": 20},
+    {"id": "e1", "content": "epsilon", "score": 0.80, "recency_days": 0, "kind": "decision", "token_count": 20}
+  ],
+  "expected_selected_ids": ["a1", "b1"],
+  "expected_rejected_reasons": {
+    "c1": "budget",
+    "d1": "budget",
+    "e1": "budget"
+  }
+}

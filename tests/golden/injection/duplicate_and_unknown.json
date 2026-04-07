@@ -1,0 +1,15 @@
+{
+  "name": "duplicate_and_unknown",
+  "budget_tokens": 120,
+  "candidates": [
+    {"id": "q1", "content": "question", "score": 0.40, "recency_days": 2, "kind": "open_question", "token_count": 20},
+    {"id": "d1", "content": "decision", "score": 0.90, "recency_days": 0, "kind": "decision", "token_count": 30},
+    {"id": "d1", "content": "duplicate decision", "score": 0.80, "recency_days": 0, "kind": "decision", "token_count": 30},
+    {"id": "x1", "content": "mystery kind", "score": 0.70, "recency_days": 0, "kind": "mystery", "token_count": 10}
+  ],
+  "expected_selected_ids": ["q1", "d1"],
+  "expected_rejected_reasons": {
+    "d1": "duplicate_id",
+    "x1": "unknown_kind"
+  }
+}
